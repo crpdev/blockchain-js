@@ -7,6 +7,7 @@ function Blockchain(){
 }
 
 // A method createNewBlock which takes in the unique PoW, hash's to push data to ledger
+// param: nonce, previousHash, hash
 Blockchain.prototype.createNewBlock = function(nonce, previousHash, hash){
 
     // creates a new block from the new transactions
@@ -28,10 +29,13 @@ Blockchain.prototype.createNewBlock = function(nonce, previousHash, hash){
 }
 
 // Method to get the last block from the ledger
+// param: 
 Blockchain.prototype.getLastBlock = function(){
-    return chain[this.chain.length - 1];
+    return this.chain[this.chain.length - 1];
 }
 
+// Method to create a new txn and add to the pendingTxn array
+// Param: amount, sender, receiver
 Blockchain.prototype.createNewTransaction = function(amount, sender, receiver){
 
     const newTransaction = {
