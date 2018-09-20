@@ -2,8 +2,8 @@
 function Blockchain(){
     // chain is to store the actual ledger [MINED]
     this.chain = []; 
-    // newTransactions hold tnx which are not yet added to ledger [NEW]
-    this.newTransactions = [];
+    // pendingTransactions hold tnx which are not yet added to ledger [NEW]
+    this.pendingTransactions = [];
 }
 
 // A method createNewBlock which takes in the unique PoW, hash's to push data to ledger
@@ -13,14 +13,14 @@ Blockchain.prototype.createNewBlock = function(nonce, previousHash, hash){
     const newBlock = {
         index: this.chain.length + 1,
         timeStamp: Date.now(),
-        transactions: this.newTransactions,
+        transactions: this.pendingTransactions,
         nonce: nonce,
         previousHash: previousHash,
         hash: hash
     };
 
-    // reset the newTransactions to an empty array
-    this.newTransactions = [];
+    // reset the pendingTransactions to an empty array
+    this.pendingTransactions = [];
     // Add the new block to the chain/ ledger
     this.chain.push(newBlock);
 
@@ -30,6 +30,19 @@ Blockchain.prototype.createNewBlock = function(nonce, previousHash, hash){
 // Method to get the last block from the ledger
 Blockchain.prototype.getLastBlock = function(){
     return chain[this.chain.length - 1];
+}
+
+Blockchain.prototype.createNewTransaction = function(amount, sender, receiver){
+
+    const newTransaction = {
+        amount: amount,
+        sender: sender,
+        receiver: receiver
+    };
+
+    this.pendingTransactions.push(newTransaction);
+
+    return this.getLastBlock()['index'] + 1
 }
 
 module.exports = Blockchain;
