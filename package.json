@@ -10,5 +10,8 @@
     "blockchain"
   ],
   "author": "Rajapandian",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "sha256": "^0.2.0"
+  }
 }
