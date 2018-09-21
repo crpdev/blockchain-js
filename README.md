@@ -3,7 +3,7 @@ Implementing a full blown, working Proof of Work blockchain using JS
 
 Majority of the code uses ES5 syntax
 
-21/09/ 2018:
+21/09/2018:
 
 1. Building a Blockchain
 
