@@ -4,7 +4,8 @@
   "description": "Blockchain using JS",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --watch dev -e js dev/api.js"
   },
   "keywords": [
     "blockchain"
@@ -12,6 +13,10 @@
   "author": "Rajapandian",
   "license": "ISC",
   "dependencies": {
-    "sha256": "^0.2.0"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "nodemon": "^1.18.4",
+    "sha256": "^0.2.0",
+    "uuid": "^3.3.2"
   }
 }

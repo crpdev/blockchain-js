@@ -121,3 +121,4 @@ console.log(myChain.hashBlock(previousBlockHash, currentBlockData, 12781));
 // Test case to validate genesis block
 
 console.log(myChain);
+    

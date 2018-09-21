@@ -63,7 +63,7 @@ Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, n
     // Append the data to form a unique string
     const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
     // retrieve a hash value from the unique string obtained
-    const hash = sha256(dataAsString);
+    const hash = sha256(dataAsString); 
     // Return the hash as a result
     return hash;
 }
