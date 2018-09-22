@@ -1,12 +1,21 @@
 // importing sha256 module
 const sha256 = require('sha256');
 
+// Get the current processing node URL
+const currentNetworkNode = process.argv[3];
+
 // Blockchain constructor function
 function Blockchain(){
     // chain is to store the actual ledger [MINED]
     this.chain = []; 
     // pendingTransactions hold tnx which are not yet added to ledger [NEW]
     this.pendingTransactions = [];
+
+    // Adding the current network node to Blockchain data structure
+    this.currentNetworkNode = currentNetworkNode;
+
+    // Populate all the participating nodes in the network
+    this.networkNodes = [];
 
     // method call on createNewBlock to create a genesis block
 
