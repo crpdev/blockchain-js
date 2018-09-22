@@ -8,8 +8,18 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Importing the Blockchain data structure
 const Blockchain = require('./blockchain');
+
+// creating a new instance/ object from the template
 const myChain =  new Blockchain();
+
+// Importing uuid/v1 module to determine the unique address of the node
+// This unique id is useful when we decentralize the network
+const uuid = require('uuid/v1');
+
+// the uuid has '-' in the string and we replace them below
+const nodeAddress = uuid().split('-').join('');
 
 // Retrieve the complete ledger - chain
 app.get('/blockchain', function(req, res) {
@@ -35,6 +45,37 @@ app.post('/transaction', function(req, res){
 
 // Mine the block of txn's to add to the block
 app.get('/mine', function(req,res){
+
+    // Get the last/ final block in the ledger
+    const lastBlock = myChain.getLastBlock();
+
+    // retrieve the hash from the last block
+    const previousBlockHash = lastBlock['hash'];
+
+    // Populate the new block data that needs to put into the ledger
+    const currentBlockData = {
+        transactions: myChain.pendingTransactions,
+        // Increment the index which will define the index of this new txn set
+        index: lastBlock['index'] + 1
+    };
+
+    // Find the nonce by calling the PoW method using the old hash & new data set
+    const nonce = myChain.proofOfWork(previousBlockHash, currentBlockData);
+
+    // From the nonce, hash the new block
+    const hashBlock = myChain.hashBlock(previousBlockHash, currentBlockData, nonce);
+
+    // Before the new block is added to ledger, we issue an incentive to the miner for adding this block to the ledger
+    myChain.createNewTransaction(12.5,"00",nodeAddress);
+
+    // Issue the creating of new block to the ledger
+    const newBlock = myChain.createNewBlock(nonce,previousBlockHash,hashBlock);
+
+    // send back the response to the client on the status
+    res.json({
+        result: "New block mined successfully",
+        block: newBlock
+    });
 
 });
 
