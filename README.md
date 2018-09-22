@@ -1,5 +1,5 @@
 # blockchain-js
-Implementing a full blown, working Proof of Work blockchain using JS
+Implementing a full blown, de-centralized, Proof of Work blockchain using JS
 
 Majority of the code uses ES5 syntax
 
