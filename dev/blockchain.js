@@ -4,6 +4,9 @@ const sha256 = require('sha256');
 // Get the current processing node URL
 const currentNetworkNode = process.argv[3];
 
+// Importing the uuid module to define a unique id for every txn
+const uuid = require('uuid/v1');
+
 // Blockchain constructor function
 function Blockchain(){
     // chain is to store the actual ledger [MINED]
@@ -57,12 +60,28 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, receiver){
     const newTransaction = {
         amount: amount,
         sender: sender,
-        receiver: receiver
+        receiver: receiver,
+        // Adding txnId to specify unique txn id for every txn
+        transactionId: uuid().split('-').join('')
     };
 
+    // Sep 23: Modified for Synchronizing the network 
+
+    /*
     this.pendingTransactions.push(newTransaction);
 
     return this.getLastBlock()['index'] + 1;
+
+    */
+
+    return newTransaction;
+}
+
+// Sep23: Created a new method to add the new txn to the pending txns
+// param: txnData -> newTxn created from the above method
+Blockchain.prototype.addTxnToPendingTxns = function(txnData){
+    this.pendingTransactions.push(txnData);
+    return this.getLastBlock['index'] + 1;
 }
 
 // Method to create a unique hash

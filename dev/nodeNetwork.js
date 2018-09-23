@@ -21,6 +21,7 @@ const uuid = require('uuid/v1');
 // the uuid has '-' in the string and we replace them below
 const nodeAddress = uuid().split('-').join('');
 
+// read the current node's URL from the config file [package.json]
 const PORT = process.argv[2];
 
 // Import the request-promise module to facilitate the register/broadcast functionality
@@ -31,8 +32,12 @@ app.get('/blockchain', function(req, res) {
     res.send(myChain);
 });
 
-// Add a new txn
+// Add a new txn specific to every node
 app.post('/transaction', function(req, res){
+
+    /*
+
+    Sep 23: Re-factoring for the synchronization module
     // variable to hold the request body
     const reqJSON = req.body;
     // Log the body
@@ -46,7 +51,45 @@ app.post('/transaction', function(req, res){
     // Send back the index as reference to the caller
     res.json({ result: `The transaction has been added and will be processed in ${processIndex} block.`});
 
-}); 
+    */
+
+    // read the new txn data from the body
+    const newTxn = req.body;
+    // read the index of the next block by calling the method on the executing node
+    const blockIndex = myChain.addTxnToPendingTxns(newTxn);
+    // send back the status referring to the block to which the txn will be added
+    res.json({ result: `Transaction will be added in block: ${blockIndex}.`})
+
+});
+
+// Adding a new txn to the network
+app.post('/transaction/broadcast', function(req, res){
+
+    // read the request body and assign to a var
+    const reqBody = req.body;
+    // invoke the createNewTxn method and store the newTxn data
+    const newTxn = myChain.createNewTransaction(reqBody.amount, reqBody.sender, reqBody.receiver);
+    // Add the new txn to the pending txn of the current node
+    myChain.addTxnToPendingTxns(newTxn);
+
+    // Block to loop through each node and adding the new txn
+    const requestPromises = [];
+    myChain.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/transaction',
+            method: 'POST',
+            body: newTxn,
+            json: true
+        };
+        requestPromises.push(rp(requestOptions));
+    });
+
+    Promise.all(requestPromises)
+    .then(data => {
+        res.json({ result: 'Transaction created and broadcasted successfully.'})
+    });
+});
+
 
 // Mine the block of txn's to add to the block
 app.get('/mine', function(req,res){
@@ -70,18 +113,69 @@ app.get('/mine', function(req,res){
     // From the nonce, hash the new block
     const hashBlock = myChain.hashBlock(previousBlockHash, currentBlockData, nonce);
 
-    // Before the new block is added to ledger, we issue an incentive to the miner for adding this block to the ledger
-    myChain.createNewTransaction(12.5,"00",nodeAddress);
-
     // Issue the creating of new block to the ledger
     const newBlock = myChain.createNewBlock(nonce,previousBlockHash,hashBlock);
 
-    // send back the response to the client on the status
-    res.json({
-        result: "New block mined successfully",
-        block: newBlock
+    // Flow to broadcast the new block to all nodes
+    const newBlockPromises = [];
+    myChain.networkNodes.forEach(networkNodeUrl => {
+
+        const requestOptions = {
+            uri: networkNodeUrl + '/receive-new-block',
+            method: 'POST',
+            body: { newBlock: newBlock },
+            json: true
+        };
+        newBlockPromises.push(rp(requestOptions));
     });
 
+    Promise.all(newBlockPromises)
+    .then(data => {
+        // After the new block is added, reward the miner by broadcasting a mined txn
+        const requestOptions = {
+            uri: myChain.currentNetworkNode + '/transaction/broadcast',
+            method: 'POST',
+            body: {
+                amount: 12.5,
+                sender: '00',
+                receiver: nodeAddress
+            },
+            json: true
+        };
+
+        return rp(requestOptions);
+    }).then (data => {
+        // send back the response to the client on the status
+        res.json({
+            result: "New block mined and broadcast successfully",
+            block: newBlock
+            });
+    });
+});
+
+// Broadcast the mined block to all the nodes in the network
+app.post('/receive-new-block', function(req, res){
+    // read the new block from the body
+    const newBlock = req.body.newBlock;
+    // get the last mined block from the ledger/chain
+    const lastBlock = myChain.getLastBlock();
+    // check if the previous hash and the last index matches with the newly mined block
+    const isValidPreviousHash = lastBlock['hash'] === newBlock.previousHash;
+    const isValidPreviousIndex = lastBlock['index'] + 1 === newBlock['index'];
+
+    // if the conditions match, the network nodes add the new block to their ledgers, else rejected
+    if (isValidPreviousHash && isValidPreviousIndex) {
+        myChain.chain.push(newBlock);
+        myChain.pendingTransactions = [];
+        res.json ({ result: 'New block received and accepted.',
+                    newBlock: newBlock
+                });
+    } else {
+        res.json ({
+            result: 'New block rejected.',
+            newBlock: newBlock
+        });
+    }
 });
 
 // Register a node and broadcast it over the network
