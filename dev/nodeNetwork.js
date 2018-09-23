@@ -258,6 +258,53 @@ app.post('/register-nodes-bulk', function(req, res){
     res.json({ result: 'Bulk registration successful.'})
 });
 
+// API to merge/ correct the executing node to match with the ledger data in the network
+app.get('/consensus', function(req, res){
+
+    // Get the ledger from all the nodes in the network
+    const requestPromises = [];
+    myChain.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/blockchain',
+            method: 'GET',
+            json: true
+        };
+
+        requestPromises.push(rp(requestOptions));
+    });
+
+    // Loop through each node and check if the current ledger is the most recent. Else replace the chain
+    Promise.all(requestPromises)
+    .then(blockchains => {
+        const currentChainLength = myChain.chain.length;
+        let maxChainLength = currentChainLength;
+        let newLongestChain = null;
+        let newPendingTxns = null;
+
+        blockchains.forEach(blockchain => {
+            if(blockchain.chain.length > maxChainLength){
+                maxChainLength = blockchain.chain.length;
+                newLongestChain = blockchain.chain;
+                newPendingTxns = blockchain.pendingTransactions;
+            };
+        });
+
+        if (!newLongestChain || (newLongestChain && !myChain.isChainValid(newLongestChain))){
+            res.json({ 
+                result: 'Chain is not replaced',
+                chain: myChain.chain
+            });
+        } else {
+            myChain.chain = newLongestChain;
+            myChain.pendingTransactions = newPendingTxns;
+            res.json({
+                result: 'Chain has been replaced.',
+                chain: newLongestChain
+            })
+        }
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}...`);
 });
