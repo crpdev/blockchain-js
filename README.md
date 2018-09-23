@@ -1,7 +1,18 @@
 # blockchain-js
 Implementing a full blown, de-centralized, Proof of Work blockchain using JS
 
-Majority of the code uses ES5 syntax
+This implementation is the result of a self study on Blockchain using JS, based on the Udemy course by Eric Traub. I recommend enrolling to the course (https://www.udemy.com/build-a-blockchain-in-javascript/), where Eric discusses on every aspect of Blockchain in much detail.
+
+The sections implemented are as follows:
+
+	- Building A Blockchain
+	- Accessing the Blockchain through an API
+	- Building a de-centralized network
+	- Synchronizing the blockchain network
+	- Adding consensus protocol to the blockchain implementation
+	- Web Interface to view the ledger based on filters
+
+Note: Majority of the code uses ES5 syntax
 
 21/09/2018:
 
@@ -92,6 +103,17 @@ The de-centralized network created in the previous section is modified and a cou
 By adding of these two endpoints to the process and modifying the process flow, the entire blockchain network now has the exact same data at any given time.
 
 This synchronized blockchain network will now be used to create the consensus protocol in the next section.
+
+5. Adding consensus protocol to the blockchain implementation
+
+Consensus is added to the blockchain implementation, where a newly added node can access the /consensus endpoint to fetch the latest chain from the network. This is based on the longest chain rule, where the chain from every node is read and the most recent [longest] chain in the network is fetched and replicated to the newly added node.
+
+This is made possible with the isChainValid method added to the blockchain data structure, which validates the entire ledger for tampered data and then the chain is replicated to the new node.
+
+ - /consensus
+   - GET: When a new node invokes the /consensus endpoint, data [chain] from all the nodes are analyzed, longest chain is 	    taken into account and validated against the isChainValid method. The isChainValid analyses the entire chain for 	       correctness and then adds the chain to this new node. This makes the new node own the exact data as the other 		  nodes over the network.
+   
+This completes the core blockchain implementation using JS. The next section will discuss on implementing a UI to visualize the ledger data on a web interface and by using filters to view specific data from the ledger.
 
 The code has detailed comments added to every section, to express clarity and functionality.
 
