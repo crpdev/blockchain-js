@@ -305,6 +305,21 @@ app.get('/consensus', function(req, res){
     });
 });
 
+// API to fetch a specific block based on the block's hash
+app.get('/block/:blockHash', function(req, res){
+
+});
+
+// API to fetch a specific block based on the block's transactionId
+app.get('/transaction/:transactionId', function(req, res){
+
+});
+
+// API to fetch a specific block based on the sender/ receiver address and display the balance
+app.get('/address/:address', function(req, res){
+
+});
+
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}...`);
 });
