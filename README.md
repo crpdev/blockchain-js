@@ -10,7 +10,7 @@ The sections implemented are as follows:
 	- Building a de-centralized network
 	- Synchronizing the blockchain network
 	- Adding consensus protocol to the blockchain implementation
-	- Web Interface to view the ledger based on filters
+	- Block Explorer - Web Interface to view the ledger based on filters
 
 Note: Majority of the code uses ES5 syntax
 
@@ -114,6 +114,21 @@ This is made possible with the isChainValid method added to the blockchain data 
    - GET: When a new node invokes the /consensus endpoint, data [chain] from all the nodes are analyzed, longest chain is 	    taken into account and validated against the isChainValid method. The isChainValid analyses the entire chain for 	       correctness and then adds the chain to this new node. This makes the new node own the exact data as the other 		  nodes over the network.
    
 This completes the core blockchain implementation using JS. The next section will discuss on implementing a UI to visualize the ledger data on a web interface and by using filters to view specific data from the ledger.
+
+24/09/2018:
+
+6. Block Explorer - Web Interface to view the ledger based on filters [block hash, transaction Id, address]
+
+The Block Explorer is a UI interface, which eases users to view the blockchain data based on specific filters. The interface invokes specific endpoints to fetch the data from the ledger.
+
+ - /block/:blockHash
+   - GET: Querying to this endpoint by passing a specific block's hash will return the block data.
+   
+ - /transaction/:transactionId
+   - GET: Querying to this endpoint by passing a specific transaction id will return the block data.
+   
+ - /address/:address
+   - GET: Querying to this endpoint by passing a sender/ receiver address will return the relevant transactions and also 	   displays the balance of the specific address.
 
 The code has detailed comments added to every section, to express clarity and functionality.
 
