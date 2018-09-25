@@ -32,7 +32,7 @@ Blockchain.prototype.createNewBlock = function(nonce, previousHash, hash){
     // creates a new block from the new transactions
     const newBlock = {
         index: this.chain.length + 1,
-        timeStamp: Date.now(),
+        timestamp: Date.now(),
         transactions: this.pendingTransactions,
         nonce: nonce,
         previousHash: previousHash,
@@ -135,6 +135,73 @@ Blockchain.prototype.isChainValid = function(blockchain){
     if (!genesisNonce || !genesisPreviousHash || !genesisHash || !genesisTxnLength) isChainValid = false;
 
     return isChainValid;
+}
+
+// Method to return the block based on the passed blockHash
+// param: blockHash
+Blockchain.prototype.getBlock = function(blockHash){
+
+    // initiate a var to hold the correct block
+    // iterate through all the blocks in the chain and if the block hash matches the input, assign the correct block and return
+    let correctBlock = null;
+    this.chain.forEach(block => {
+        if (block.hash === blockHash) correctBlock = block;
+    });
+
+    return correctBlock;
+}
+
+// Method to return the block/txn based on the passed transactionId
+// param: transactionId
+Blockchain.prototype.getTransaction = function(transactionId){
+
+    // initiate 2 vars to hold the correct txn and block
+    // iterate through all the blocks in the chain and also the txns in the chain to check if the txn id matches the input, assign the correct txn/ block and return the object
+    let correctBlock = null;
+    let correctTransaction = null;
+    this.chain.forEach (block => {
+        block.transactions.forEach (transaction => {
+            if (transaction.transactionId === transactionId) {
+                correctTransaction = transaction;
+                correctBlock = block;
+            }; 
+        });
+    });
+
+    return {
+        transaction: correctTransaction,
+        block: correctBlock
+    };
+}
+
+// Method to return the txns/balance based on the passed address
+// param: address
+Blockchain.prototype.getAddress = function(address){
+
+    // initiate an array to hold any txn to/from the address passed
+    // Loop through the block/ txns and add the txns which match the address
+    const addressTxns = [];
+    this.chain.forEach (block => {
+        block.transactions.forEach (transaction => {
+            if (transaction.sender === address || transaction.receiver === address){
+                addressTxns.push(transaction);
+            }
+        });
+    });
+
+    // declare a var to hold the balance
+    let addressBalance = 0;
+    // iterate through the txns and calculate the balance of the address passed
+    addressTxns.forEach (transaction => {
+        if (transaction.receiver === address ) addressBalance += transaction.amount;
+        else if (transaction.sender === address ) addressBalance -= transaction.amount;
+    });
+
+    return {
+        address: address,
+        transactions: addressTxns,
+        balance: addressBalance
+    };
 }
 
 module.exports = Blockchain;

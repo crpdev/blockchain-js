@@ -308,16 +308,65 @@ app.get('/consensus', function(req, res){
 // API to fetch a specific block based on the block's hash
 app.get('/block/:blockHash', function(req, res){
 
+    // get the blockHash value from the URI
+    const blockHash = req.params.blockHash;
+    const resBlock = myChain.getBlock(blockHash);
+
+    if (resBlock) res.json( 
+        { 
+            block: resBlock,
+            isPresent: true
+        } );
+
+    else res.json( 
+        { 
+            isPresent: false
+        } );
+
 });
 
 // API to fetch a specific block based on the block's transactionId
 app.get('/transaction/:transactionId', function(req, res){
 
+    // get the transactionId value from the URI
+    const transactionId = req.params.transactionId;
+    const resObj = myChain.getTransaction(transactionId);
+
+    if (resObj.transaction) res.json( 
+        { 
+            resObj,
+            isTxnPresent: true
+        } );
+
+    else res.json( 
+        { 
+            isTxnPresent: false
+        } );
 });
 
 // API to fetch a specific block based on the sender/ receiver address and display the balance
 app.get('/address/:address', function(req, res){
 
+    // get the transactionId value from the URI
+    const address = req.params.address;
+    const resObj = myChain.getAddress(address);
+
+    if (resObj.transactions) res.json( 
+        { 
+            resObj,
+            isAddressPresent: true
+        } );
+
+    else res.json( 
+        { 
+            isAddressPresent: false
+        } );
+});
+
+app.get('/block-explorer', function(req, res){
+
+
+    res.sendFile('./block-explorer/index.html', { root: __dirname });
 });
 
 app.listen(PORT, () => {
