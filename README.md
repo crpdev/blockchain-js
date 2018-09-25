@@ -123,12 +123,22 @@ The Block Explorer is a UI interface, which eases users to view the blockchain d
 
  - /block/:blockHash
    - GET: Querying to this endpoint by passing a specific block's hash will return the block data.
+   	  This endpoint calls the blockchain data structure method getBlock to iterate the ledger and fetch the block
    
  - /transaction/:transactionId
    - GET: Querying to this endpoint by passing a specific transaction id will return the block data.
+   	  This endpoint calls the blockchain data structure method getTransaction to iterate the ledger and fetch the txn	   and block.
    
  - /address/:address
    - GET: Querying to this endpoint by passing a sender/ receiver address will return the relevant transactions and also 	   displays the balance of the specific address.
+      	  This endpoint calls the blockchain data structure method getAddress to iterate the ledger and fetch the txns made 	      as a sender/ receiver and calculates the balance block.
+	  
+25/09/2018:
+
+ - /block-explorer
+   - GET: Angular based UI which inturn calls the above endpoints from an index.html file and displays the result.
+   
+***Note: The UI is still under testing and the index.html will be updated after the tests are successful.
 
 The code has detailed comments added to every section, to express clarity and functionality.
 
