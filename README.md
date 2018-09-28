@@ -1,6 +1,9 @@
 # blockchain-js
 Implementing a full blown, de-centralized, Proof of Work blockchain using JS
 
+Note: To load the dependencies used in this project, issue npm install from the command line of the project directory [where package.json is present] and all the used modules will be downloaded to the workspace.
+
+
 This implementation is the result of a self study on Blockchain using JS, based on the Udemy course by Eric Traub. I recommend enrolling to the course (https://www.udemy.com/build-a-blockchain-in-javascript/), where Eric discusses on every aspect of Blockchain in much detail.
 
 The sections implemented are as follows:
